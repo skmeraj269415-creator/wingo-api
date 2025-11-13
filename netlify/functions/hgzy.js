@@ -5,19 +5,23 @@ export async function handler(event, context) {
     const CURRENT_API = `https://draw.ar-lottery01.com/WingO_30S.json?ts=${timestamp}`;
     const HISTORY_API = `https://draw.ar-lottery01.com/WingO_30S/GetHistoryIssuePage.json?ts=${timestamp}`;
 
-    const currentRes = await fetch(CURRENT_API);
-    const historyRes = await fetch(HISTORY_API);
+    const headers = {
+      "User-Agent": "Mozilla/5.0",
+      "Accept": "application/json,text/plain,*/*",
+    };
+
+    const currentRes = await fetch(CURRENT_API, { headers });
+    const historyRes = await fetch(HISTORY_API, { headers });
 
     const currentText = await currentRes.text();
     const historyText = await historyRes.text();
 
-    // HTML আসলে error দেবে
     if (currentText.startsWith("<") || historyText.startsWith("<")) {
       return {
         statusCode: 500,
         body: JSON.stringify({
           ok: false,
-          error: "Source API returned HTML instead of JSON"
+          error: "API returned HTML (blocked). Need custom proxy."
         })
       };
     }
