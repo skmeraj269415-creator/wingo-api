@@ -6,10 +6,24 @@ export async function handler(event, context) {
     const HISTORY_API = `https://draw.ar-lottery01.com/WingO_30S/GetHistoryIssuePage.json?ts=${timestamp}`;
 
     const currentRes = await fetch(CURRENT_API);
-    const currentData = await currentRes.json();
-
     const historyRes = await fetch(HISTORY_API);
-    const historyData = await historyRes.json();
+
+    const currentText = await currentRes.text();
+    const historyText = await historyRes.text();
+
+    // HTML আসলে error দেবে
+    if (currentText.startsWith("<") || historyText.startsWith("<")) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({
+          ok: false,
+          error: "Source API returned HTML instead of JSON"
+        })
+      };
+    }
+
+    const currentData = JSON.parse(currentText);
+    const historyData = JSON.parse(historyText);
 
     return {
       statusCode: 200,
